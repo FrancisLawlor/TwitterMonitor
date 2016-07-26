@@ -17,11 +17,20 @@ else
 	exit 0
 fi
 
+# Parse number of tweets user currently has for comparison when user tweets/removes tweets.
 prev=`curl -s "https://twitter.com/$1" | grep -o -P '(?<=title=").*(?= Tweets)'`
+
+# Remove any commas from the parse number.
+prev="${prev//,}"
 
 while [ 1 ];
 do
 	current=`curl -s "https://twitter.com/$1" | grep -o -P '(?<=title=").*(?= Tweets)'`
+	
+	# Remove any commas from the parse number.
+
+	current="${current//,}"
+
 	if [ $current -gt $prev ]
 	then
        		`echo "A new tweet!" | mail -s "New tweet from @$1!" $2`
