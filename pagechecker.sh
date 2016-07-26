@@ -2,8 +2,22 @@
 
 #First parameter should be twitter username. Second parameter should be e-mail address to send prompt to.
 
+# Check if user is failing to enter the two required parameters.
+if [ ! $# -eq 2 ]
+	then echo You must enter two arguments, the username you want to monitor and the e-mail to send notifications to!
+	exit
+fi
+
+# Check if the indicated username is valid.
+if curl --output /dev/null --head --fail --silent "https://twitter.com/$1"
+then
+	echo "Running..."
+else
+	echo "Cannot find $1's profile!"
+	exit 0
+fi
+
 prev=`curl -s "https://twitter.com/$1" | grep -o -P '(?<=title=").*(?= Tweets)'`
-echo "Running..."
 
 while [ 1 ];
 do
@@ -19,5 +33,5 @@ do
 		`notify-send "@$1 removed a tweet!"`
 		prev=$current
    	fi
-	sleep 10   
+	sleep 10
 done		
