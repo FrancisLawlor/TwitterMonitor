@@ -1,4 +1,4 @@
-1#!/bin/bash
+#!/bin/bash
 
 #First parameter should be twitter username. Second parameter should be e-mail address to send prompt to.
 
