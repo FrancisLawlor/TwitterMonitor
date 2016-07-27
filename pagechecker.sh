@@ -1,4 +1,4 @@
-#!/bin/bash
+1#!/bin/bash
 
 #First parameter should be twitter username. Second parameter should be e-mail address to send prompt to.
 
@@ -34,7 +34,12 @@ do
 	if [ $current -gt $prev ]
 	then
        		`echo "A new tweet!" | mail -s "New tweet from @$1!" $2`
-		`notify-send "New tweet from @$1!"`
+		
+		# Add image to your notification by adding the path as a parameter to the the notify-send command.
+		# Mine is called "smirk.png and is stored in the Pictures directory.
+		# :smirk:
+
+		`notify-send "New tweet from @$1!" -i ~/Pictures/smirk.png`
 		prev=$current
 
 	elif [ $current -lt $prev ]
