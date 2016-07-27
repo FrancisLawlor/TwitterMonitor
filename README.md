@@ -23,7 +23,7 @@ Set permissions:
 chmod a+x pagechecker.sh
 ```
 
-Example use:
+Run:
 
 ```
 ./pagechecker.sh foxnews example@example.com
