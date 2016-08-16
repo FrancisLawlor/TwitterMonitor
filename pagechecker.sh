@@ -19,14 +19,14 @@ else
 fi
 
 # Parse number of tweets user currently has for comparison when user tweets/removes tweets.
-prev=`curl -s "https://twitter.com/$1" | grep -o -P '(?<=title=").*(?= Tweets)'`
+prev=`curl -s "https://twitter.com/$1" | grep -o -P '(?<=title=").*(?= Tweet)'`
 
 # Remove any commas from the parsed number.
 prev="${prev//,}"
 
 while [ 1 ];
 do
-	current=`curl -s "https://twitter.com/$1" | grep -o -P '(?<=title=").*(?= Tweets)'`
+	current=`curl -s "https://twitter.com/$1" | grep -o -P '(?<=title=").*(?= Tweet)'`
 	
 	# Remove any commas from the parsed number.
 
