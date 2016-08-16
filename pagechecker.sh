@@ -32,24 +32,42 @@ do
 
 	current="${current//,}"
 
-	if [ $current -gt $prev ]
+	# Check if number of tweets increases from 0. The variable prev will have an empty string when the number of tweets is zero.
+	if [ -z $prev ] && [ ! -z $current ]
 	then
-		if [ -n "$2" ]
-		then
-       			`echo "Check @$1's twitter for their latest tweet!" | mail -s "New tweet from @$1!" $2`
-		fi
-		
-		# Add image to your notification by adding the path as a parameter to the the notify-send command.
-		# Mine is called "smirk.png and is stored in the Pictures directory.
-		# :smirk:
-
 		`notify-send "New tweet from @$1!" -i ~/Pictures/smirk.png`
 		prev=$current
-
-	elif [ $current -lt $prev ]
+	fi
+	
+	# Check if number of tweets decreases to 0.
+	if [ ! -z $prev ] && [ -z $current ]
 	then
 		`notify-send "@$1 removed a tweet!"`
 		prev=$current
-   	fi
+	fi
+		
+	# Account for when number of tweets doesn't decrease to or increase from 0.
+	if [ ! -z $current ] && [ ! -z $prev ]
+	then
+		if [ $current -gt $prev ]
+		then
+			if [ -n "$2" ]
+			then
+				`echo "Check @$1's twitter for their latest tweet!" | mail -s "New tweet from @$1!" $2`
+			fi
+			
+			# Add image to your notification by adding the path as a parameter to the the notify-send command.
+			# Mine is called "smirk.png and is stored in the Pictures directory.
+			# :smirk:
+
+			`notify-send "New tweet from @$1!" -i ~/Pictures/smirk.png`
+			prev=$current
+
+		elif [ $current -lt $prev ]
+		then
+			`notify-send "@$1 removed a tweet!"`
+			prev=$current
+		fi
+	fi
 	sleep 10
 done		
