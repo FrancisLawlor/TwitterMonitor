@@ -9,6 +9,15 @@ then
 	exit 
 fi
 
+# Check if user account is private by parsing html and checking for indication of privacy icon.
+private=`curl -s "https://twitter.com/$1" | grep -o -P '(?<=span class="Icon Icon--).*(?="><span)'`
+
+if [[ $private == *"protected"* ]]
+then
+	echo "This user's account is private!"
+	exit 0
+fi
+
 # Check if the indicated username is valid by checking if the corresponding webpage exists.
 if curl --output /dev/null --head --fail --silent "https://twitter.com/$1"	
 then
