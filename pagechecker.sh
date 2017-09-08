@@ -1,25 +1,12 @@
 #!/bin/bash
 
-#First parameter should be twitter username. Second optional parameter should be e-mail address to send prompt to.
-
-# Check if user is failing to enter the required parameters.
 if [ ! $# -eq 1 ] && [ ! $# -eq 2 ]
-then 
-	echo "You must enter the username whose account you want to monitor and/or an e-mail address to send notifications!"
-	exit 
-fi
-
-# Check if user account is private by parsing html and checking for indication of privacy icon.
-private=`curl -s "https://twitter.com/$1" | grep -o -P '(?<=span class="Icon Icon--).*(?="><span)'`
-
-if [[ $private == *"protected"* ]]
 then
-	echo "This user's account is private!"
-	exit 0
+	echo "You must enter the username whose account you want to monitor and/or an e-mail address to send notifications!"
+	exit
 fi
 
-# Check if the indicated username is valid by checking if the corresponding webpage exists.
-if curl --output /dev/null --head --fail --silent "https://twitter.com/$1"	
+if curl --output /dev/null --head --fail --silent "https://twitter.com/$1"
 then
 	echo "Running..."
 else
@@ -27,56 +14,46 @@ else
 	exit 0
 fi
 
-# Parse number of tweets user currently has for comparison when user tweets/removes tweets.
-prev=`curl -s "https://twitter.com/$1" | grep -o -P '(?<=title=").*(?= Tweet)'`
-
-# Remove any commas from the parsed number.
-prev="${prev//,}"
+previousNumberOfTweets=`curl -s "https://twitter.com/$1" | grep -o -P '(?<=title=").*(?= Tweet)'`
+previousNumberOfTweets="${previousNumberOfTweets//,}"
 
 while [ 1 ];
 do
-	current=`curl -s "https://twitter.com/$1" | grep -o -P '(?<=title=").*(?= Tweet)'`
-	
-	# Remove any commas from the parsed number.
+	currentNumberOfTweets=`curl -s "https://twitter.com/$1" | grep -o -P '(?<=title=").*(?= Tweet)'`
+	currentNumberOfTweets="${currentNumberOfTweets//,}"
 
-	current="${current//,}"
-
-	# Check if number of tweets increases from 0. The variable prev will have an empty string when the number of tweets is zero.
-	if [ -z $prev ] && [ ! -z $current ]
+	# Check if number of tweets increases from 0 (Edge case).
+	if [ -z $previousNumberOfTweets ] && [ ! -z $currentNumberOfTweets ]
 	then
 		`notify-send "New tweet from @$1!" -i ~/Pictures/smirk.png`
-		prev=$current
+		previousNumberOfTweets=$currentNumberOfTweets
 	fi
-	
-	# Check if number of tweets decreases to 0.
-	if [ ! -z $prev ] && [ -z $current ]
+
+	# Check if number of tweets decreases to 0 (Edge case).
+	if [ ! -z $previousNumberOfTweets ] && [ -z $currentNumberOfTweets ]
 	then
 		`notify-send "@$1 removed a tweet!"`
-		prev=$current
+		previousNumberOfTweets=$currentNumberOfTweets
 	fi
-		
-	# Account for when number of tweets doesn't decrease to or increase from 0.
-	if [ ! -z $current ] && [ ! -z $prev ]
+
+	if [ ! -z $currentNumberOfTweets ] && [ ! -z $previousNumberOfTweets ]
 	then
-		if [ $current -gt $prev ]
+		if [ $currentNumberOfTweets -gt $previousNumberOfTweets ]
 		then
 			if [ -n "$2" ]
 			then
 				`echo "Check @$1's twitter for their latest tweet!" | mail -s "New tweet from @$1!" $2`
 			fi
-			
-			# Add image to your notification by adding the path as a parameter to the the notify-send command.
-			# Mine is called "smirk.png and is stored in the Pictures directory.
-			# :smirk:
 
-			`notify-send "New tweet from @$1!" -i ~/Pictures/smirk.png`
-			prev=$current
+			# Replace image path with yours.
+			`notify-send "New tweet from @$1!" -i ~/Pictures/twitter_icon.png`
+			previousNumberOfTweets=$currentNumberOfTweets
 
-		elif [ $current -lt $prev ]
+		elif [ $currentNumberOfTweets -lt $previousNumberOfTweets ]
 		then
 			`notify-send "@$1 removed a tweet!"`
-			prev=$current
+			previousNumberOfTweets=$currentNumberOfTweets
 		fi
 	fi
 	sleep 10
-done		
+done
