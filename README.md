@@ -1,14 +1,13 @@
 # TwitterMonitor
-A script which enables you to receive notifications via OS and e-mail when a specific user has tweeted something new.
 
-Script requires use of several packages including: 
+Requires use of several packages including:
 
-* cURL 
+* cURL
 * mailutils
 * libnotify-bin.
 
 ### Parameters
-Parameter 1: 
+Parameter 1:
 
 - twitter username
 
